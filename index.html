@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>क्या हाल चाल app</title>
+    <script src="https://kit.fontawesome.com/d5c2b12eef.js" crossorigin="anonymous"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+        * {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: white;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        section.chat__section {
+            width: 800px;
+            max-width: 90%;
+            background: #fff;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .brand {
+            padding: 20px;
+            background: #f1f1f1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand h1 {
+            text-transform: uppercase;
+            font-size: 20px;
+            color: #444;
+            margin-left: 10px;
+        }
+
+        .message__area {
+            height: 500px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            padding-top: 40px;
+        }
+
+        textarea {
+            width: 100%;
+            border: none;
+            padding: 20px;
+            font-size: 16px;
+            outline: none;
+            background: #f1f1f1;
+        }
+
+        .message {
+            padding: 20px;
+            border-radius: 4px;
+            margin-bottom: 40px;
+            max-width: 300px;
+            position: relative;
+        }
+
+        .incoming {
+            background: #8F8BE8;
+            color: #fff;
+        }
+
+        .outgoing {
+            background: #e9eafd;
+            color: #787986;
+            margin-left: auto;
+        }
+
+        .message h4 {
+            position: absolute;
+            top: -20px;
+            left: 0;
+            color: #333;
+            font-size: 14px;
+        }
+
+        button {
+            background-color: #333;
+            color: #fff;
+            border: 0;
+            outline: 0;
+            width: 120px;
+            height: 40px;
+            cursor: pointer;
+            border-radius: 15px;
+        }
+
+        #toastBox {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            align-items: flex-end;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .toast {
+            width: 250px;
+            height: 80px;
+            background-color: #fff;
+            margin: 15px 0;
+            box-shadow: 5px 5px 20px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+
+        .toast i {
+            margin: 0 20px;
+            font-size: 25px;
+            color: green;
+        }
+
+        .toast::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            height: 4px; /* Changed height from 'green' to '4px' */
+            background-color: green; /* Fixed the height typo */
+            animation: anim 5s linear forwards;
+        }
+
+        .popup {
+            width: 400px;
+            border-radius: 6px;
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.1);
+            visibility: hidden;
+            text-align: center;
+            padding: 0 30px 30px;
+            transition: transform 0.4s, top 0.4s;
+            color: #fff;
+            background-color: #fff; /* Added background color */
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2); /* Added box-shadow for visibility */
+            z-index: 1000; /* Ensure it's on top of other elements */
+        }
+
+        .popup h2 {
+            font-size: 38px;
+            font-weight: 500;
+            margin: 30px 0 10px;
+            color: #000;
+        }
+
+        .popup button {
+            margin-top: 50px;
+            border-radius: 5px;
+            background-color: #333;
+            color: #fff;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+
+        .popup ul li {
+            list-style-type: none;
+            margin-bottom: 10px; /* Added margin bottom for spacing */
+        }
+
+        .popup ul li a {
+            color: black;
+            text-decoration: none;
+            display: flex;
+            justify-content: space-evenly;
+            font-size: 15px;
+            padding: 10px 20px;
+        }
+
+        .open-popup {
+            visibility: visible;
+            top: 50%;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .close-popup {
+            visibility: hidden;
+        }
+
+        .rating-box {
+            position: relative;
+            background: transparent;
+            padding: 15px 40px 30px;
+            border-radius: 25px;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .rating-box .starts {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+
+        .starts i {
+            color: #0e0d0d;
+            font-size: 35px;
+            cursor: pointer;
+        }
+
+        .starts i.active {
+            color: yellow;
+        }
+
+        @keyframes anim {
+            100% {
+                width: 0;
+            }
+        }
+
+        .sec {
+            display: none;
+        }
+
+        .sec.active {
+            display: block;
+        }
+
+        .container-div {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .form {
+            text-align: center; /* Center align form contents */
+            max-width: 400px; /* Set max width for form */
+            padding: 20px; /* Add padding for spacing */
+        }
+
+        .form h1 {
+            color: #0e0d0d;
+            font-size: 38px;
+            margin-bottom: 20px; /* Add margin bottom for spacing */
+        }
+
+        
+
+        .form label {
+            font-size: 20px;
+            display: block;
+            margin-bottom: 10px; /* Add margin bottom for spacing */
+        }
+
+        .form input[type="text"] {
+            width: calc(100% - 40px); /* Calculate width with padding */
+            padding: 10px; /* Add padding for input */
+            font-size: 16px;
+            margin-bottom: 20px; /* Add margin bottom for spacing */
+            border: 1px solid #ccc; /* Add border for clarity */
+            border-radius: 5px; /* Add border radius */
+        }
+
+        .form button {
+            background-color: #333;
+            color: #fff;
+            border: 0;
+            outline: 0;
+            width: 100%; /* Full width button */
+            height: 40px;
+            cursor: pointer;
+            border-radius: 15px;
+            font-size: 16px;
+        }
+
+        .chat__section{
+            animation: bodyani 4s ;
+        }
+
+        @keyframes bodyani {
+            from{
+                opacity: 0;
+            }
+
+            to{
+                opacity: 1;
+            }
+        }
+
+        @media screen and (max-width: 600px) {
+            section.chat__section {
+                width: 100%; /* Full width on smaller screens */
+            }
+
+            .popup {
+                width: 90%; /* Adjust popup width */
+                padding: 10px; /* Adjust padding */
+            }
+
+            .form {
+                max-width: 90%; /* Adjust form max width */
+            }
+
+            .form h1 {
+                font-size: 28px; /* Adjust heading font size */
+            }
+
+            .form label,
+            .form input,
+            .form button {
+                font-size: 14px; /* Adjust font size for label, input, and button */
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <section class="home-section sec active">
+        <div class="container-div">
+            <div class="form">
+                <h1>WELCOME !!</h1>
+                <br>
+                <label for="inputName">Username:</label>
+                <input type="text" id="inputName" required>
+                <br><br>
+                <button onclick="switchTab()">Join chat</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="chat__section sec">
+        <div class="brand">
+            <span>Chat anywhere with
+                <h1 title="">क्या हाल चाल app</h1>
+            </span>
+            <button onclick="toggleMenu()">Menu</button>
+            <div class="popup" id="menuPopup">
+                <h2>Menu</h2>
+                <ul>
+                    <li><a href="#">About</a></li>
+                    <li><a href="#">Problem</a></li>
+                </ul>
+                <button onclick="clearChat()" style="width: 100px;">Clear chat</button>
+                <br>
+                <br>
+                <button onclick="toggleMenu()" style="width: 100px;">Close</button>
+            </div>
+            <div id="toastBox"></div>
+        </div>
+        <div class="message__area"></div>
+        <div>
+            <textarea id="textarea" cols="30" rows="1" placeholder="Write a message..."></textarea>
+        </div>
+    </section>
+    
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        let name;
+        let textarea = document.querySelector('#textarea');
+        let messageArea = document.querySelector('.message__area');
+
+        textarea.addEventListener('keyup', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage(e.target.value);
+            }
+        });
+
+        function sendMessage(message) {
+            name = document.querySelector("#inputName").value;
+            let msg = {
+                user: name,
+                message: message.trim()
+            };
+            appendMessage(msg, 'outgoing');
+            textarea.value = '';
+            scrollToBottom();
+            socket.emit('message', msg);
+        }
+
+        function appendMessage(msg, type) {
+            let mainDiv = document.createElement('div');
+            let className = type;
+            mainDiv.classList.add(className, 'message');
+
+            let markup = `
+                <h4>${msg.user}</h4>
+                <p>${msg.message}</p>
+            `;
+            mainDiv.innerHTML = markup;
+            messageArea.appendChild(mainDiv);
+        }
+
+        socket.on('message', (msg) => {
+            appendMessage(msg, 'incoming');
+            scrollToBottom();
+        });
+
+        function scrollToBottom() {
+            messageArea.scrollTop = messageArea.scrollHeight;
+        }
+
+        function showToast(msg) {
+            let toast = document.createElement('div');
+            toast.classList.add('toast');
+            toast.innerHTML = msg;
+            document.getElementById('toastBox').appendChild(toast);
+
+            setTimeout(() => {
+                toast.remove();
+            }, 5000);
+        }
+
+        let menuPopup = document.getElementById('menuPopup');
+
+function toggleMenu() {
+    menuPopup.classList.toggle('open-popup');
+}
+
+function clearChat() {
+    messageArea.innerHTML = '';
+}
+
+function hideMenu() {
+    menuPopup.classList.remove('open-popup');
+}
+
+        const stars = document.querySelectorAll(".starts i");
+        stars.forEach((star, index1) => {
+            star.addEventListener("click", () => {
+                stars.forEach((star, index2) => {
+                    if (index1 >= index2) {
+                        star.classList.add("active");
+                    } else {
+                        star.classList.remove("active");
+                    }
+                });
+            });
+        });
+
+        function switchTab() {
+            document.querySelector(".home-section").classList.remove("active");
+            document.querySelector(".chat__section").classList.add("active");
+        }
+
+        
+    </script>
+</body>
+
+</html>
